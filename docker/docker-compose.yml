@@ -27,7 +27,7 @@ services:
       syncthing:
         condition: service_healthy
     volumes:
-      - /opt/connaissance/vault:/vault
+      - /opt/connaissance:/opt/connaissance
       - ./git-watcher.sh:/git-watcher.sh:ro
       - /home/phaedrus/.ssh:/root/.ssh:ro  # For git SSH auth (if needed)
     env_file:
@@ -44,5 +44,5 @@ services:
       - |
         apk add --no-cache git inotify-tools curl && \
         cd /opt/connaissance && \
-        /git-watcher.sh
+        sh /git-watcher.sh
     working_dir: /opt/connaissance
