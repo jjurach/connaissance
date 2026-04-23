@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Hentown Obsidian Vault Schema (Simplified)",
+  "description": "Minimal JSON Schema for validating frontmatter in vault notes. Only essential fields: type, created, project, status.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "created"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["project", "spec", "plan", "prompt", "summary", "memory", "inbox", "note"],
+      "description": "The file class type. Determines vault location and expected purpose."
+    },
+    "created": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}(?:_\\d{2}-\\d{2}-\\d{2})?$",
+      "description": "Creation date in YYYY-MM-DD or YYYY-MM-DD_HH-MM-SS format."
+    },
+    "project": {
+      "type": "string",
+      "pattern": "^\\[\\[.+\\]\\]$",
+      "description": "Wikilink to the project hub note, e.g., [[chatterbox]]. Required for files under 10-Projects/."
+    },
+    "original_path": {
+      "type": "string",
+      "description": "Path to the original source file before migration. Breadcrumb for audit trail."
+    },
+    "status": {
+      "type": "string",
+      "description": "Status of this item (free-form text, e.g., 'planned', 'in-progress', 'completed'). Extract from body if present."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {"enum": ["project", "spec", "plan", "prompt", "summary"]}
+        }
+      },
+      "then": {
+        "required": ["type", "created", "project"]
+      }
+    }
+  ]
+}

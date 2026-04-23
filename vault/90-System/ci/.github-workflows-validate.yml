@@ -1,0 +1,38 @@
+name: Validate Obsidian Vault
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml jsonschema
+
+      - name: Validate vault
+        run: |
+          python -m modules.hentown_obsidian.scripts.refractor validate \
+            --vault-root modules/hentown-obsidian/vault \
+            --report .github/validate-report/
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: vault-validation-report
+          path: .github/validate-report/

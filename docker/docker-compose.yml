@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  syncthing:
+    image: syncthing/syncthing:latest
+    restart: unless-stopped
+    ports:
+      - "8384:8384"  # Web UI
+      - "22000:22000/tcp"  # Sync protocol TCP
+      - "22000:22000/udp"  # Sync protocol UDP
+      - "21027:21027/udp"  # Discovery
+    volumes:
+      - ./syncthing-config:/var/syncthing/config
+      - ../vault:/var/syncthing/vault
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8384"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  git-watcher:
+    image: alpine:latest
+    restart: unless-stopped
+    depends_on:
+      syncthing:
+        condition: service_healthy
+    volumes:
+      - ../vault:/vault
+      - ./git-watcher.sh:/git-watcher.sh:ro
+      - /home/phaedrus/.ssh:/root/.ssh:ro  # For git SSH auth (if needed)
+    env_file:
+      - .env
+    environment:
+      - VAULT_PATH=/vault
+      - GIT_AUTHOR_NAME=connaissance-watcher
+      - GIT_AUTHOR_EMAIL=${GITHUB_EMAIL:-phaedrus@example.com}
+      - GIT_COMMITTER_NAME=connaissance-watcher
+      - GIT_COMMITTER_EMAIL=${GITHUB_EMAIL:-phaedrus@example.com}
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        apk add --no-cache git inotify-tools curl && \
+        cd /vault/.. && \
+        /git-watcher.sh
+    working_dir: /vault/..
