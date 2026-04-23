@@ -39,6 +39,7 @@ Thumbs.db
 
 # Syncthing
 syncthing-config/
+.stfolder/
 .sync-conflict-*
 
 # Temporary
