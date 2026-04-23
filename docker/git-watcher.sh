@@ -56,7 +56,7 @@ while read -r dir action file; do
     sleep "$QUIET_PERIOD"
 
     # Check if there are actual changes to commit
-    if ! git diff --quiet --cached && ! git diff --quiet; then
+    if ! git diff --quiet --cached || ! git diff --quiet; then
         echo "[$(date '+%Y-%m-%d %H:%M:%S')] 📝 Quiet period complete, committing changes..."
 
         # Pull first to avoid conflicts
