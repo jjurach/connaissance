@@ -45,3 +45,4 @@ syncthing-config/
 # Temporary
 *.tmp
 tmp-*
+.stfolder/
