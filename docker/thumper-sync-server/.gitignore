@@ -1,0 +1,10 @@
+# Syncthing config (generated at runtime)
+syncthing-config/
+
+# Environment variables (contains GitHub PAT)
+.env
+!.env.example
+
+# Docker artifacts
+.docker/
+.dockerignore
